@@ -5,6 +5,17 @@ from rand import shuffle
 
 
 def data_iter(features, target, batch_size=32, seed=1024):
+    """数据集批次生成器。每次从数据集中返回一个批次，每轮迭代前会打乱数据集
+
+    Args:
+        features: 特征
+        target: 目标
+        batch_size: 批大小
+        seed: 随机化种子
+
+    Returns: 生成器
+
+    """
     num = len(target)
     idx = list(range(num))
     while True:
@@ -16,6 +27,17 @@ def data_iter(features, target, batch_size=32, seed=1024):
 
 
 def train_test_split(features, target, train_ratio, seed=65536):
+    """数据集划分为训练集和测试集
+
+    Args:
+        features: 特征
+        target: 目标
+        train_ratio: 训练集所占的比例
+        seed: 随机化种子
+
+    Returns: 训练集特征，训练集目标，测试集特征，测试集目标
+
+    """
     shuffle(features, seed)
     shuffle(target, seed)
     train_x = features[:int(len(target) * train_ratio)]
@@ -26,11 +48,18 @@ def train_test_split(features, target, train_ratio, seed=65536):
 
 
 def min_max_scaler(features):
-    """
-    归一化
+    """对每个特征按最大最小值进行线性缩放归一化至[0, 1]
+    x = (x - min) / (max - min)
 
-    >>> min_max_scaler([[-1, 2], [-0.5, 6], [0, 10], [1, 18]])
-    [[0.0, 0.0], [0.25, 0.25], [0.5, 0.5], [1.0, 1.0]]
+    Args:
+        features: 特征
+
+    Returns: 归一化后的特征
+
+    Examples:
+        >>> min_max_scaler([[-1, 2], [-0.5, 6], [0, 10], [1, 18]])
+        [[0.0, 0.0], [0.25, 0.25], [0.5, 0.5], [1.0, 1.0]]
+
     """
     transposed = transpose(features)
     for i in range(len(transposed)):
@@ -40,6 +69,15 @@ def min_max_scaler(features):
 
 
 def accuracy(pred, target):
+    """计算准确率
+
+    Args:
+        pred: 预测值（每个分类的确信度）
+        target: 目标（是哪个分类）
+
+    Returns: 准确率
+
+    """
     counter = 0
     for i in range(len(pred)):
         max_pred = 0

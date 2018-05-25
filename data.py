@@ -2,7 +2,17 @@
 # -*- coding: utf-8 -*-
 
 
-def load_csv(csv, features_type, target_type=int):
+def load_csv(csv, features_type=float, target_type=int):
+    """加载csv。最后一列为目标列，其余为特征。
+
+    Args:
+        csv: csv文件名
+        features_type: 特征的数据类型
+        target_type: 目标的数据类型
+
+    Returns: 特征, 目标
+
+    """
     features = []
     target = []
     for i, line in enumerate(open(csv)):

@@ -3,6 +3,24 @@
 
 
 def shape(x):
+    """计算多维数组的形状
+    
+    Args:
+        x: 数组
+
+    Returns: 数组的形状
+    
+    Examples:
+        >>> shape(1)
+        ()
+        >>> shape([1, 2])
+        (2,)
+        >>> shape([[1, 1], [2, 2], [3, 3]])
+        (3, 2)
+        >>> shape([[[1, 2, 3], [4, 5, 6]]])
+        (1, 2, 3)
+
+    """
     if isinstance(x, (list, tuple)):
         value = []
         tmp = x
@@ -15,9 +33,22 @@ def shape(x):
 
 
 def reshape(x, row, col):
-    """reshape a list or tuple to a matrix"""
+    """将数组变形为矩阵
+    
+    Args:
+        x: 数组
+        row: 行数
+        col: 列数
+
+    Returns: 矩阵
+    
+    Examples:
+        >>> reshape([1, 2, 3, 4, 5, 6], 2, 3)
+        [[1, 2, 3], [4, 5, 6]]
+
+    """
     if len(x) != row * col:
-        raise ValueError("Can't reshape to (%d, %d) from length %d" % (row, col, len(x)))
+        raise ValueError("不能将长度为%d的数组变形为%dx%d大小的矩阵" % (len(x), row, col))
     reshaped = []
     for i in range(row):
         reshaped.append([])
@@ -27,12 +58,20 @@ def reshape(x, row, col):
 
 
 def each(x, func):
-    """
-    x: matrix(mxn)
-    逐元素计算
+    """对数组或矩阵中每个元素执行计算
+    
+    Args:
+        x: 数组或矩阵
+        func: 要执行的计算
 
-    >>> each([[1, 2], [3, 4]], lambda x: x ** 2)
-    [[1, 4], [9, 16]]
+    Returns: 执行计算后的数组或矩阵
+    
+    Examples:
+        >>> each([1, 2, 3], lambda x: x * 2)
+        [2, 4, 6]
+        >>> each([[1, 2], [3, 4]], lambda x: x * 2)
+        [[2, 4], [6, 8]]
+
     """
     if len(shape(x)) == 1:
         return list(map(func, x))
@@ -44,17 +83,27 @@ def each(x, func):
                 result[i][j] = func(x[i][j])
         return result
     else:
-        raise ValueError("Input Error: expect 2-dim list")
+        raise ValueError("输入错误：期望是数组或矩阵")
 
 
 def accord(a, b, op):
-    """
-    a, b: matrix(mxn)
-    a, b: list(n)
-    >>> accord([[1, 2]], [[3, 4]], '+')
-    [[4, 6]]
-    >>> accord([5, 3], [2, 3], '-')
-    [3, 0]
+    """形状相同的两个数组或矩阵对应位置元素执行计算
+    
+    Args:
+        a: 数组或矩阵
+        b: 数组或矩阵
+        op: 要执行的运算：四则运算或函数
+
+    Returns: 执行计算后的数组或矩阵
+    
+    Examples:
+        >>> accord([[1, 2]], [[3, 4]], '+')
+        [[4, 6]]
+        >>> accord([5, 3], [2, 3], '-')
+        [3, 0]
+        >>> accord([[2, 4]], [[1, 3]], lambda x, y: 2 * x + y)
+        [[5, 11]]
+
     """
     if op in ('+', '-', '*', '/'):
         op = {
@@ -64,7 +113,7 @@ def accord(a, b, op):
             '/': lambda x, y: x / y,
         }[op]
     elif not isinstance(op, type(lambda: None)):
-        raise ValueError("输入的操作不合法")
+        raise ValueError("输入的运算不合法")
 
     if len(shape(a)) == 1 and len(shape(b)) == 1:
         return [op(ai, bi) for ai, bi in zip(a, b)]
@@ -76,15 +125,24 @@ def accord(a, b, op):
                 result[i][j] = op(a[i][j], b[i][j])
         return result
     else:
-        raise ValueError("输入数组维数不合法")
+        raise ValueError("输入错误：期望是两个数组或矩阵且二者形状相同")
 
 
 def sum_axis(x, axis=0):
-    """
-    >>> sum_axis([[1, 2, 3], [3, 4, 5]], axis=0)
-    [4, 6, 8]
-    >>> sum_axis([[1, 2, 3], [3, 4, 5]], axis=1)
-    [6, 12]
+    """对矩阵某个轴进行求和
+    
+    Args:
+        x: 矩阵
+        axis: 轴序号
+
+    Returns: 求和的结果
+    
+    Examples:
+        >>> sum_axis([[1, 2, 3], [3, 4, 5]], axis=0)
+        [4, 6, 8]
+        >>> sum_axis([[1, 2, 3], [3, 4, 5]], axis=1)
+        [6, 12]
+
     """
     if len(shape(x)) == 2:
         m, n = shape(x)
@@ -99,18 +157,24 @@ def sum_axis(x, axis=0):
                 result[i] = sum([xi for xi in x[i]])
             return result
     else:
-        raise ValueError("输入数组维数不合法")
+        raise ValueError("输入错误：期望是一个矩阵")
 
 
 def transpose(x):
-    """
-    x: matrix(mxn)
+    """转置矩阵
+    
+    Args:
+        x: 矩阵
 
-    >>> transpose([[1, 2, 3]])
-    [[1], [2], [3]]
+    Returns: 转置后的矩阵
+    
+    Examples:
+        >>> transpose([[1, 2, 3]])
+        [[1], [2], [3]]
+
     """
     if len(shape(x)) != 2:
-        raise ValueError("Input Error: expect 2-dim list")
+        raise ValueError("输入错误：期望是一个矩阵")
     m, n = shape(x)
     result = reshape([None] * (m * n), n, m)
     for i in range(m):
@@ -120,15 +184,25 @@ def transpose(x):
 
 
 def dot(a, b):
-    """
-    a: matrix(mxn)
-    b: matrix(nxs)
-    return: mxs
+    """矩阵点乘
+
+    Args:
+        a: 矩阵
+        b: 矩阵
+
+    Returns: 矩阵点乘
+
+    Examples:
+        >>> dot([[1, 2]], [[3], [4]])
+        [[11]]
+        >>> dot([[1], [2]], [[3, 4]])
+        [[3, 4], [6, 8]]
+
     """
     if len(shape(a)) != 2 or len(shape(b)) != 2:
-        raise ValueError("Input Error: expect two matrices")
+        raise ValueError("输入错误：期望是两个矩阵")
     if shape(a)[1] != shape(b)[0]:
-        raise ValueError("Shapes dismatch for %s and %s" % (shape(a), shape(b)))
+        raise ValueError("形状不匹配：%s与%s，不能执行点乘" % (shape(a), shape(b)))
     m, n = shape(a)
     s = shape(b)[1]
     result = reshape([None] * (m * s), m, s)
