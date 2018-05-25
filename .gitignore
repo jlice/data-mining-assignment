@@ -1,2 +1,5 @@
 MNIST-data/*.csv
 MNIST-data/*.gz
+__pycache__/
+.idea/
+.ipynb_checkpoints/
